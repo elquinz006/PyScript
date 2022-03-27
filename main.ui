@@ -63,19 +63,26 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionSave_Configuration"/>
-    <addaction name="actionLoad_Configuration"/>
+    <addaction name="actionSave_Config"/>
+    <addaction name="actionLoad_Config"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionMerge_Summary_files"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionSave_Configuration">
+  <action name="actionSave_Config">
    <property name="text">
     <string>Save Configuration</string>
    </property>
   </action>
-  <action name="actionLoad_Configuration">
+  <action name="actionLoad_Config">
    <property name="text">
     <string>Load Configuration</string>
    </property>
@@ -83,6 +90,11 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionMerge_Summary_files">
+   <property name="text">
+    <string>Merge Summary files</string>
    </property>
   </action>
  </widget>
