@@ -2,6 +2,7 @@ import sys
 import os
 import ntpath
 import configparser
+from parseSA import mergeSA
 
 from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtWidgets import *
@@ -23,8 +24,9 @@ config.add_section('SNAP')
 # cfInp  = config["INPUT"]
 # cfSnp  = config["SNAP"]
 
-Exec = ""
 
+# Global
+Exec = ""
 #UI파일 연결
 #단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -49,6 +51,9 @@ class WindowClass(QMainWindow, form_class) :
 
         # Btn
         self.btn_SelectFile.clicked.connect(self.getfiles)
+
+        # Edit
+        self.actionMerge_Summary_files.triggered.connect(self.MergeSA)
 
 
     def getfiles(self):
@@ -80,6 +85,12 @@ class WindowClass(QMainWindow, form_class) :
     def LoadConf(self):
         name = QFileDialog.getOpenFileName(
             self, 'Load configuration file', filter="ini (*.ini)")[0]
+
+
+    def MergeSA(self):
+        SAfld = QFileDialog.getExistingDirectory(self, 'Select Directory')
+      #   print(SAfld)
+        mergeSA(SAfld)
 
 
 if __name__ == "__main__" :
