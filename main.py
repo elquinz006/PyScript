@@ -89,8 +89,9 @@ class WindowClass(QMainWindow, form_class) :
 
     def MergeSA(self):
         SAfld = QFileDialog.getExistingDirectory(self, 'Select Directory')
+        SAfile = QFileDialog.getSaveFileName(self, 'Save Collection of SA_summary file')
       #   print(SAfld)
-        mergeSA(SAfld)
+        mergeSA(SAfld, SAfile[0])
 
 
 if __name__ == "__main__" :

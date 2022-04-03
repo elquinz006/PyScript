@@ -5,9 +5,10 @@ root = '.\\'
 pattern = 'SA_summary.dat'
 newSA = 'Col_SA_summary.dat'
 
-def mergeSA(fld):
+def mergeSA(fld, file):
    fcnt = int(0)
-   with open(newSA,'w') as outfile:
+#    with open(newSA,'w') as outfile:
+   with open(file,'w') as outfile:
       for path, subdirs, files in os.walk(fld):
          for name in files:
             if fnmatch(name, pattern):
