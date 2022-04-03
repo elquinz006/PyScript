@@ -60,6 +60,7 @@ class WindowClass(QMainWindow, form_class) :
     #   filePath = QFileDialog.getOpenFileName(self, filter="exe(*.exe)")
     #   fileName = filePath[0]
     #   print(fileName[0])
+        global Exec
       fileName = QFileDialog.getOpenFileName(
           self, 'Select TASS exec', filter="exe (*.exe)")[0]
       Exec = ntpath.basename(fileName)
