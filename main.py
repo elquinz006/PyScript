@@ -2,11 +2,14 @@ import sys
 import os
 import ntpath
 import configparser
-from parseSA import mergeSA
+# from parseSA import mergeSA
+# from util import *
+import utils
 
-from PyQt5 import QtGui, QtWidgets, QtCore
-from PyQt5.QtWidgets import *
-from PyQt5 import uic
+# from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5 import uic, QtWidgets
 
 
 def resource_path(relative_path):
@@ -20,37 +23,44 @@ config = configparser.ConfigParser()
 config.add_section('EXE')
 config.add_section('INPUT')
 config.add_section('SNAP')
-# cfExec = config["Exec"]
-# cfInp  = config["INPUT"]
-# cfSnp  = config["SNAP"]
 
 
 # Global
-Exec = ""
+Exec = ''
+Inputfld = ''
+Snapfld = ''
+InputList = []
+SnapList = []
 #UI파일 연결
 #단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # form_class = uic.loadUiType("main.ui")[0]
-form_class = uic.loadUiType(BASE_DIR+r'\main.ui')[0]
+main_ui = uic.loadUiType(BASE_DIR+r'\main.ui')[0]
 
 #화면을 띄우는데 사용되는 Class 선언
-class WindowClass(QMainWindow, form_class) :
+class WindowClass(QMainWindow, main_ui) :
     def __init__(self) :
         super().__init__()
         self.setupUi(self)
+        # self.setupUI(self)
         # self.setupUI()
-        # self.setWindowTitle("내마음대로 제목")
 
+    def setupUI(self):
+        # self.actionSave_Config = QtWidgets.QAction(self)
+        # self.actionLoad_Config = QtWidgets.QAction(self)
         # Status bar
         # Save conf
         self.actionSave_Config.triggered.connect(self.SaveConf)
         # Load conf
         self.actionLoad_Config.triggered.connect(self.LoadConf)
         # Exit
-        self.actionExit.triggered.connect(qApp.quit)
+        # self.actionExit.triggered.connect(qApp.quit)
+        self.actionExit.triggered.connect(app.quit)
 
         # Btn
         self.btn_SelectFile.clicked.connect(self.getfiles)
+        ext = 'cd'
+        self.btn_SelectInput.clicked.connect(lambda: self.showList(ext))
 
         # Edit
         self.actionMerge_Summary_files.triggered.connect(self.MergeSA)
@@ -61,12 +71,28 @@ class WindowClass(QMainWindow, form_class) :
     #   fileName = filePath[0]
     #   print(fileName[0])
         global Exec
-      fileName = QFileDialog.getOpenFileName(
-          self, 'Select TASS exec', filter="exe (*.exe)")[0]
-      Exec = ntpath.basename(fileName)
-      Exec = os.path.splitext(Exec)[0]
-      self.label_Exec.setText(Exec)
-      config.set('EXE','TASSexe',Exec)
+        fileName = QFileDialog.getOpenFileName(
+            self, 'Select TASS exec', filter="exe (*.exe)")[0]
+        Exec = ntpath.basename(fileName)
+        Exec = os.path.splitext(Exec)[0]
+        self.label_Exec.setText(Exec)
+        config.set('EXE','TASSexe',Exec)
+
+
+    def showList(self, ext):
+        res = []
+        ifld = QFileDialog.getExistingDirectory(self, 'Select Directory')
+        # ext = 'cd'
+        if ext=='cd':
+            InputList = utils.getfilist(ifld, ext)
+            # print(*InputList, sep = "\n")
+            model = QStandardItemModel()
+            for id in InputList:
+                model.appendRow(QStandardItem(id))
+            self.list_input.setModel(model)
+        elif ext=='snp':
+            SnapList = utils.getfilist(ifld, ext)
+            # print('Under Construction')
 
 
     def SaveConf(self):
@@ -101,7 +127,7 @@ if __name__ == "__main__" :
 
     #WindowClass의 인스턴스 생성
     myWindow = WindowClass()
-
+    myWindow.setupUI()
     #프로그램 화면을 보여주는 코드
     myWindow.show()
 
