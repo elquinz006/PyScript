@@ -9,7 +9,7 @@ import utils
 # from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5 import uic, QtWidgets
+from PyQt5 import QtCore, uic, QtWidgets
 
 
 def resource_path(relative_path):
@@ -29,8 +29,8 @@ config.add_section('SNAP')
 Exec = ''
 Inputfld = ''
 Snapfld = ''
-InputList = []
-SnapList = []
+# InputList = []
+# SnapList = []
 #UI파일 연결
 #단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -42,19 +42,18 @@ class WindowClass(QMainWindow, main_ui) :
     def __init__(self) :
         super().__init__()
         self.setupUi(self)
-        # self.setupUI(self)
-        # self.setupUI()
 
-    def setupUI(self):
-        # self.actionSave_Config = QtWidgets.QAction(self)
-        # self.actionLoad_Config = QtWidgets.QAction(self)
+        self.connections()
+
+    # @QtCore.pyqtSlot()
+    # def update_buttons_status(self):
+
+
+
+    def connections(self):
         # Status bar
-        # Save conf
         self.actionSave_Config.triggered.connect(self.SaveConf)
-        # Load conf
         self.actionLoad_Config.triggered.connect(self.LoadConf)
-        # Exit
-        # self.actionExit.triggered.connect(qApp.quit)
         self.actionExit.triggered.connect(app.quit)
 
         # Btn
@@ -65,7 +64,9 @@ class WindowClass(QMainWindow, main_ui) :
         # Edit
         self.actionMerge_Summary_files.triggered.connect(self.MergeSA)
 
+        # self.mButtonToSelected.clicked.connect(self.on_mButtonToSelected_clicked)
 
+    @QtCore.pyqtSlot()
     def getfiles(self):
     #   filePath = QFileDialog.getOpenFileName(self, filter="exe(*.exe)")
     #   fileName = filePath[0]
@@ -84,16 +85,11 @@ class WindowClass(QMainWindow, main_ui) :
         ifld = QFileDialog.getExistingDirectory(self, 'Select Directory')
         # ext = 'cd'
         if ext=='cd':
-            InputList = utils.getfilist(ifld, ext)
-            # print(*InputList, sep = "\n")
-            model = QStandardItemModel()
-            for id in InputList:
-                model.appendRow(QStandardItem(id))
-            self.list_input.setModel(model)
+            self.InputList = utils.getfilist(ifld, ext)
+            for icd in self.InputList:
+                self.list_input.addItem(icd)
         elif ext=='snp':
-            SnapList = utils.getfilist(ifld, ext)
-            # print('Under Construction')
-
+            self.SnapList = utils.getfilist(ifld, ext)
 
     def SaveConf(self):
         name = QFileDialog.getSaveFileName(
@@ -127,7 +123,7 @@ if __name__ == "__main__" :
 
     #WindowClass의 인스턴스 생성
     myWindow = WindowClass()
-    myWindow.setupUI()
+
     #프로그램 화면을 보여주는 코드
     myWindow.show()
 
