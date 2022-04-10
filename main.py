@@ -2,15 +2,13 @@ import sys
 import os
 import ntpath
 import configparser
-# from parseSA import mergeSA
-# from util import *
+from parseSA import mergeSA
 import utils
 
-# from PyQt5 import QtGui, QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5 import QtCore, uic, QtWidgets
-
+from PyQt5 import uic, QtWidgets
+from PyQt5.QtCore import pyqtSlot
 
 def resource_path(relative_path):
     # Get absolute path to resource, works for dev and for PyInstaller
@@ -18,12 +16,10 @@ def resource_path(relative_path):
         os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
 
-
 config = configparser.ConfigParser()
 config.add_section('EXE')
 config.add_section('INPUT')
 config.add_section('SNAP')
-
 
 # Global
 Exec = ''
@@ -38,20 +34,22 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 main_ui = uic.loadUiType(BASE_DIR+r'\main.ui')[0]
 
 #화면을 띄우는데 사용되는 Class 선언
-class WindowClass(QMainWindow, main_ui) :
-    def __init__(self) :
+# class WindowClass(QMainWindow, main_ui) :
+class WindowClass(QMainWindow) :
+    def __init__(self) -> None :
         super().__init__()
-        self.setupUi(self)
+        # self.setupUi(self)
+        uic.loadUi('main.ui', self)
 
         self.connections()
 
     # @QtCore.pyqtSlot()
     # def update_buttons_status(self):
 
-
-
+    @pyqtSlot()
     def connections(self):
         # Status bar
+
         self.actionSave_Config.triggered.connect(self.SaveConf)
         self.actionLoad_Config.triggered.connect(self.LoadConf)
         self.actionExit.triggered.connect(app.quit)
@@ -64,13 +62,8 @@ class WindowClass(QMainWindow, main_ui) :
         # Edit
         self.actionMerge_Summary_files.triggered.connect(self.MergeSA)
 
-        # self.mButtonToSelected.clicked.connect(self.on_mButtonToSelected_clicked)
-
-    @QtCore.pyqtSlot()
+    @pyqtSlot()
     def getfiles(self):
-    #   filePath = QFileDialog.getOpenFileName(self, filter="exe(*.exe)")
-    #   fileName = filePath[0]
-    #   print(fileName[0])
         global Exec
         fileName = QFileDialog.getOpenFileName(
             self, 'Select TASS exec', filter="exe (*.exe)")[0]
@@ -79,7 +72,7 @@ class WindowClass(QMainWindow, main_ui) :
         self.label_Exec.setText(Exec)
         config.set('EXE','TASSexe',Exec)
 
-
+    @pyqtSlot()
     def showList(self, ext):
         res = []
         ifld = QFileDialog.getExistingDirectory(self, 'Select Directory')
@@ -87,10 +80,11 @@ class WindowClass(QMainWindow, main_ui) :
         if ext=='cd':
             self.InputList = utils.getfilist(ifld, ext)
             for icd in self.InputList:
-                self.list_input.addItem(icd)
+                self.mInput.addItem(icd)
         elif ext=='snp':
             self.SnapList = utils.getfilist(ifld, ext)
 
+    @pyqtSlot()
     def SaveConf(self):
         name = QFileDialog.getSaveFileName(
             self, 'Save configuration file', filter="ini (*.ini)")[0]
@@ -104,18 +98,36 @@ class WindowClass(QMainWindow, main_ui) :
             msgBox.setText('Select TASS exec first!')
             msgBox.exec_()
 
-
+    @pyqtSlot()
     def LoadConf(self):
         name = QFileDialog.getOpenFileName(
             self, 'Load configuration file', filter="ini (*.ini)")[0]
 
-
+    @pyqtSlot()
     def MergeSA(self):
         SAfld = QFileDialog.getExistingDirectory(self, 'Select Directory')
         SAfile = QFileDialog.getSaveFileName(self, 'Save Collection of SA_summary file')
-      #   print(SAfld)
         mergeSA(SAfld, SAfile[0])
 
+    @pyqtSlot()
+    def on_mButtonToSelected_clicked(self):
+        while self.mInput.count() > 0:
+            self.mOuput.addItem(self.mInput.takeItem(0))
+
+    @pyqtSlot()
+    def on_mBtnMoveToAvailable_clicked(self):
+        item = self.mInput.currentRow()
+        print(item)
+        self.mOuput.addItem(self.mInput.takeItem(self.mInput.currentRow()))
+
+    @pyqtSlot()
+    def on_mBtnMoveToSelected_clicked(self):
+        self.mInput.addItem(self.mOuput.takeItem(self.mOuput.currentRow()))
+
+    @pyqtSlot()
+    def on_mButtonToAvailable_clicked(self):
+        while self.mOuput.count() > 0:
+            self.mInput.addItem(self.mOuput.takeItem(0))
 
 if __name__ == "__main__" :
     #QApplication : 프로그램을 실행시켜주는 클래스
@@ -126,7 +138,6 @@ if __name__ == "__main__" :
 
     #프로그램 화면을 보여주는 코드
     myWindow.show()
-
+    # raise SystemExit(app.exec_())
     #프로그램을 이벤트루프로 진입시키는(프로그램을 작동시키는) 코드
     app.exec_()
-
