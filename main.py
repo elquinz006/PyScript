@@ -43,8 +43,11 @@ class WindowClass(QMainWindow) :
 
         self.connections()
 
-    # @QtCore.pyqtSlot()
-    # def update_buttons_status(self):
+    def update_buttons_status(self):
+        self.mBtnUp.setDisabled(not bool(self.mOuput.selectedItems()) or self.mOuput.currentRow() == 0)
+        self.mBtnDown.setDisabled(not bool(self.mOuput.selectedItems()) or self.mOuput.currentRow() == (self.mOuput.count() -1))
+        self.mBtnMoveToAvailable.setDisabled(not bool(self.mInput.selectedItems()) or self.mOuput.currentRow() == 0)
+        self.mBtnMoveToSelected.setDisabled(not bool(self.mOuput.selectedItems()))
 
     @pyqtSlot()
     def connections(self):
@@ -128,6 +131,20 @@ class WindowClass(QMainWindow) :
     def on_mButtonToAvailable_clicked(self):
         while self.mOuput.count() > 0:
             self.mInput.addItem(self.mOuput.takeItem(0))
+
+    @pyqtSlot()
+    def on_mBtnUp_clicked(self):
+        row = self.mOuput.currentRow()
+        currentItem = self.mOuput.takeItem(row)
+        self.mOuput.insertItem(row - 1, currentItem)
+        self.mOuput.setCurrentRow(row - 1)
+
+    @pyqtSlot()
+    def on_mBtnDown_clicked(self):
+        row = self.mOuput.currentRow()
+        currentItem = self.mOuput.takeItem(row)
+        self.mOuput.insertItem(row + 1, currentItem)
+        self.mOuput.setCurrentRow(row + 1)
 
 if __name__ == "__main__" :
     #QApplication : 프로그램을 실행시켜주는 클래스
